@@ -1,4 +1,4 @@
-module SQLConn
+module github.com/bofen97/sqlc
 
 go 1.21.0
 
