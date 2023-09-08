@@ -1,0 +1,4 @@
+github.com/bofen97/musical-spoon v0.0.3 h1:aJA49SCNyN119vUPjJ5UkHuxVvWasN+ogGRPjJd2qUg=
+github.com/bofen97/musical-spoon v0.0.3/go.mod h1:cpuOtaOWiW6M4+rZlOYvQVpsvymtEH2lga9ziyy8bvY=
+github.com/go-sql-driver/mysql v1.7.1 h1:lUIinVbN1DY0xBg0eMOzmmtGoHwWBbvnWubQUrtU8EI=
+github.com/go-sql-driver/mysql v1.7.1/go.mod h1:OXbVy3sEdcQ2Doequ6Z5BW6fXNQTmx+9S1MCJN5yJMI=
