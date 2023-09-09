@@ -1,7 +1,6 @@
-package SQLConn_test
+package SQLConn
 
 import (
-	"SQLConn"
 	"testing"
 )
 
@@ -14,25 +13,25 @@ remote mysql server
 
 	"<username>:<passwd>@tcp(<remote>:<port>)/arxivInfo?parseTime=true"
 */
-// func Test_PutAllTopicGo(t *testing.T) {
+func Test_PutAllTopicGo(t *testing.T) {
 
-// 	const mysqlUrl = "root:@(127.0.0.1:3306)/arxivInfo?parseTime=true"
+	const mysqlUrl = "root:@(127.0.0.1:3306)/arxivInfo?parseTime=true"
 
-//		var sqlc = new(SQLConn.SQLConn)
-//		err := sqlc.Connect(mysqlUrl)
-//		if err != nil {
-//			t.Fatal(err)
-//		}
-//		sqlc.CreateTable()
-//		if err := sqlc.PutAllTopics(); err != nil {
-//			t.Fatal(err)
-//		}
-//	}
+	var sqlc = new(SQLConn)
+	err := sqlc.Connect(mysqlUrl)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sqlc.CreateTable()
+	if err := sqlc.PutAllTopics(); err != nil {
+		t.Fatal(err)
+	}
+}
 func Test_PutOneTopicGo(t *testing.T) {
 
 	const mysqlUrl = "root:@(127.0.0.1:3306)/arxivInfo?parseTime=true"
 
-	var sqlc = new(SQLConn.SQLConn)
+	var sqlc = new(SQLConn)
 	err := sqlc.Connect(mysqlUrl)
 	if err != nil {
 		t.Fatal(err)
