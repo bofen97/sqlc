@@ -122,19 +122,15 @@ func (sqlc *SQLConn) PutToTable(topic string) error {
 
 func (sqlc *SQLConn) PutAllTopics() error {
 	ch := make(chan error)
-	threads := make(chan struct{}, 20)
 
 	for _, topic := range arxiv.Topics {
 		for _, v := range topic.SubTopics {
 
 			go func(code string) {
 
-				threads <- struct{}{}
-
 				log.Printf("Put key %s into database\n", strings.ToLower(v.Code))
 
 				ch <- sqlc.PutToTable(strings.ToLower(code))
-				<-threads
 			}(v.Code)
 
 			time.Sleep(3 * time.Second)
