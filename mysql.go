@@ -13,6 +13,12 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+/*
+1) sqlc := new(SQLConn)
+2) sqlc.Connect()
+3) sqlc.CreateTable()
+4) sqlc.PutAllTopics()
+*/
 type SQLConn struct {
 	db *sql.DB
 }
@@ -114,34 +120,38 @@ func (sqlc *SQLConn) PutToTable(topic string) error {
 	return nil
 }
 
-func (sqlc *SQLConn) PutAllTopics(mysqlUrl string) error {
+func (sqlc *SQLConn) PutAllTopics() error {
+	ch := make(chan error)
+	threads := make(chan struct{}, 20)
 
-	// err := sqlc.Connect(mysqlUrl)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// 	return err
-	// }
-	err := sqlc.CreateTable()
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
 	for _, topic := range arxiv.Topics {
 		for _, v := range topic.SubTopics {
-			log.Printf("Put key %s into database\n", strings.ToLower(v.Code))
 
-			err = sqlc.PutToTable(strings.ToLower(v.Code))
-			if err != nil {
+			go func(code string) {
 
-				log.Fatal(err)
-				return err
-			}
+				threads <- struct{}{}
+
+				log.Printf("Put key %s into database\n", strings.ToLower(v.Code))
+
+				ch <- sqlc.PutToTable(strings.ToLower(code))
+				<-threads
+			}(v.Code)
+
+			time.Sleep(3 * time.Second)
+
+		}
+	}
+	for err := range ch {
+		if err != nil {
+			log.Fatal(err)
+			return err
 		}
 	}
 	return nil
 
 }
 
+// Query filed from db/topicSummary
 type TiAuSuId struct {
 	Title   string `json:"title"`
 	Authors string `json:"authors"`
@@ -212,24 +222,3 @@ func (sqlc *SQLConn) QueryHash(hash string) (bool, error) {
 	return false, nil
 
 }
-
-// //const mysqlUrl = "root:@(127.0.0.1:3306)/arxivInfo?parseTime=true"
-
-// func main() {
-
-// 	mysqlUrl := os.Getenv("mysqlURL")
-// 	if mysqlUrl == "" {
-// 		log.Fatal("URL IS NONE .")
-// 		return
-// 	}
-
-// 	var sqlc = new(SQLConn)
-// 	err := sqlc.Connect(mysqlUrl)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	if err := sqlc.PutAllTopics(mysqlUrl); err != nil {
-// 		log.Fatal(err)
-// 	}
-
-// }
