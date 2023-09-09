@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"sync"
 	"time"
 
 	arxiv "github.com/bofen97/musical-spoon"
@@ -121,28 +122,25 @@ func (sqlc *SQLConn) PutToTable(topic string) error {
 }
 
 func (sqlc *SQLConn) PutAllTopics() error {
-	ch := make(chan error)
-
+	var wg sync.WaitGroup
 	for _, topic := range arxiv.Topics {
 		for _, v := range topic.SubTopics {
+			wg.Add(1)
 
 			go func(code string) {
+				defer wg.Done()
 
 				log.Printf("Put key %s into database\n", strings.ToLower(v.Code))
 
-				ch <- sqlc.PutToTable(strings.ToLower(code))
+				sqlc.PutToTable(strings.ToLower(code))
 			}(v.Code)
 
 			time.Sleep(3 * time.Second)
 
 		}
 	}
-	for err := range ch {
-		if err != nil {
-			log.Fatal(err)
-			return err
-		}
-	}
+	wg.Wait()
+
 	return nil
 
 }
