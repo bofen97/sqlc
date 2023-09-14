@@ -41,3 +41,13 @@ func Test_PutOneTopicGo(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func Test_Custom(t *testing.T) {
+
+	var sqlc = new(SQLConn)
+	data, err := sqlc.QueryCustomTopicFromArxiv("go programming")
+	if err != nil {
+		t.Fatalf("error %v", err)
+	}
+	t.Logf("%s\n", data)
+}

@@ -189,30 +189,44 @@ func (sqlc *SQLConn) QueryTitleAuthorsSummaryId(topic string, date string) ([]by
 
 }
 
-func (sqlc *SQLConn) QueryHash(hash string) (bool, error) {
+type CustomTopicRet struct {
+	Title   string `json:"title"`
+	Authors string `json:"authors"`
+	Summary string `json:"summary"`
+	Id      string `json:"url"`
+	Time    string `json:"published"`
+}
 
-	query := "select created_at from topicSummary where hash=?"
-	var tmp string = ""
-
-	rows, err := sqlc.db.Query(query, hash)
-
+func (sqlc *SQLConn) QueryCustomTopicFromArxiv(custom string) ([]byte, error) {
+	var v = new(arxiv.Result)
+	err := v.MakeResultFromCustomTopic(custom)
 	if err != nil {
 		log.Fatal(err)
-		return false, err
+		return nil, err
 	}
-	defer rows.Close()
 
-	for rows.Next() {
+	var result []CustomTopicRet
+	for _, entry := range v.Entry {
 
-		err = rows.Scan(&tmp)
-		if err != nil {
-			log.Fatal(err)
-			return false, err
+		authors := ""
+		for _, author := range entry.Authors {
+			authors += author.Name + ","
 		}
-	}
-	if tmp != "" {
-		return true, nil
-	}
-	return false, nil
+		res := CustomTopicRet{
 
+			Id:      entry.Id,
+			Title:   entry.Title,
+			Authors: authors,
+			Summary: entry.Summary,
+
+			Time: entry.Published,
+		}
+		result = append(result, res)
+	}
+
+	data, err := json.MarshalIndent(result, " ", " ")
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
