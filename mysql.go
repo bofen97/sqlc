@@ -154,7 +154,7 @@ type TiAuSuId struct {
 }
 
 func (sqlc *SQLConn) QueryTitleAuthorsSummaryId(topic string, date string) ([]byte, error) {
-	query := "select id, title , summary,authors  from topicSummary where topic=? and date=?"
+	query := "select id, title , summary,authors  from topicSummary where topic=? and date>=?"
 	rows, err := sqlc.db.Query(query, topic, date)
 
 	if err != nil {
