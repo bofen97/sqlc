@@ -147,14 +147,15 @@ func (sqlc *SQLConn) PutAllTopics() error {
 
 // Query filed from db/topicSummary
 type TiAuSuId struct {
-	Title   string `json:"title"`
-	Authors string `json:"authors"`
-	Summary string `json:"summary"`
-	Id      string `json:"url"`
+	Title     string `json:"title"`
+	Authors   string `json:"authors"`
+	Summary   string `json:"summary"`
+	Id        string `json:"url"`
+	Published string `json:"published"`
 }
 
 func (sqlc *SQLConn) QueryTitleAuthorsSummaryId(topic string, date string) ([]byte, error) {
-	query := "select id, title , summary,authors  from topicSummary where topic=? and date>=?"
+	query := "select id, title , summary,authors,published  from topicSummary where topic=? and date>=?"
 	rows, err := sqlc.db.Query(query, topic, date)
 
 	if err != nil {
@@ -166,7 +167,7 @@ func (sqlc *SQLConn) QueryTitleAuthorsSummaryId(topic string, date string) ([]by
 	for rows.Next() {
 
 		var tmp TiAuSuId
-		err := rows.Scan(&tmp.Id, &tmp.Title, &tmp.Summary, &tmp.Authors)
+		err := rows.Scan(&tmp.Id, &tmp.Title, &tmp.Summary, &tmp.Authors, &tmp.Published)
 		if err != nil {
 			log.Fatal(err)
 			return nil, err
