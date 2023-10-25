@@ -41,7 +41,7 @@ func (sqlc *SQLConn) Connect(url string) (err error) {
 }
 func (sqlc *SQLConn) getTopicLatestDate(topicId string) (string, error) {
 	queryStr := `
-	select max(published) from topicSummary where topic=? ORDER BY published DESC
+	select ifnull (max(published),"1972-07-13T17:58:34Z") from topicSummary where topic=? ORDER BY published DESC
 	`
 	queryRow := sqlc.db.QueryRow(queryStr, topicId)
 	var latest string
@@ -135,18 +135,44 @@ func (sqlc *SQLConn) PutToTable(topic string) error {
 }
 
 func (sqlc *SQLConn) PutAllTopics() error {
+	//init msg send
+
+	sgm := new(SendGoogleMessage)
+	if err := sgm.Init(); err != nil {
+		return err
+	}
+
 	var wg sync.WaitGroup
 	for _, topic := range arxiv.Topics {
 		for _, v := range topic.SubTopics {
 			wg.Add(1)
 
-			go func(code string) {
+			go func(code string, topicStr string) {
 				defer wg.Done()
 
-				log.Printf("Put key %s into database\n", strings.ToLower(v.Code))
+				log.Printf("Put key %s into database\n", strings.ToLower(code))
 
+				beforeDate, err := sqlc.getTopicLatestDate(strings.ToLower(code))
+				if err != nil {
+					log.Fatal(err)
+				}
 				sqlc.PutToTable(strings.ToLower(code))
-			}(v.Code)
+
+				newDate, err := sqlc.getTopicLatestDate(strings.ToLower(code))
+				if err != nil {
+					log.Fatal(err)
+				}
+				//got new data
+				if newDate > beforeDate {
+
+					ret, err := sgm.sendMessageToTopic(strings.ToLower(code), topicStr)
+					if err != nil {
+						log.Fatal(err)
+					}
+					log.Print(ret)
+				}
+
+			}(v.Code, v.SubTopicName)
 
 			time.Sleep(3 * time.Second)
 
