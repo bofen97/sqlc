@@ -15,9 +15,9 @@ type SendGoogleMessage struct {
 	cli *messaging.Client
 }
 
-func (sgm *SendGoogleMessage) Init() error {
+func (sgm *SendGoogleMessage) Init(filename string) error {
 
-	opt := option.WithCredentialsFile("./easypapertracker-firebase-adminsdk-n61r9-3f7fc2d7a3.json")
+	opt := option.WithCredentialsFile(filename)
 	config := &firebase.Config{ProjectID: "easypapertracker"}
 	app, err := firebase.NewApp(context.Background(), config, opt)
 	if err != nil {

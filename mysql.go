@@ -134,11 +134,11 @@ func (sqlc *SQLConn) PutToTable(topic string) error {
 	return nil
 }
 
-func (sqlc *SQLConn) PutAllTopics() error {
+func (sqlc *SQLConn) PutAllTopics(filename string) error {
 	//init msg send
 
 	sgm := new(SendGoogleMessage)
-	if err := sgm.Init(); err != nil {
+	if err := sgm.Init(filename); err != nil {
 		return err
 	}
 

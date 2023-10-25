@@ -23,7 +23,7 @@ func Test_PutAllTopicGo(t *testing.T) {
 		t.Fatal(err)
 	}
 	sqlc.CreateTable()
-	if err := sqlc.PutAllTopics(); err != nil {
+	if err := sqlc.PutAllTopics("name for google key"); err != nil {
 		t.Fatal(err)
 	}
 }
