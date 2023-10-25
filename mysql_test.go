@@ -51,3 +51,17 @@ func Test_Custom(t *testing.T) {
 	}
 	t.Logf("%s\n", data)
 }
+
+func Test_Latest(t *testing.T) {
+	var sqlc = new(SQLConn)
+	err := sqlc.Connect("root:@(127.0.0.1:3306)/arxivInfo?parseTime=true")
+	if err != nil {
+		t.Error(err)
+	}
+	data, err := sqlc.getTopicLatestDate("cs.ai")
+	if err != nil {
+		t.Error(err)
+	}
+	t.Logf("%v", data)
+
+}

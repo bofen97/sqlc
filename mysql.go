@@ -39,6 +39,19 @@ func (sqlc *SQLConn) Connect(url string) (err error) {
 	}
 	return nil
 }
+func (sqlc *SQLConn) getTopicLatestDate(topicId string) (string, error) {
+	queryStr := `
+	select max(published) from topicSummary where topic=? ORDER BY published DESC
+	`
+	queryRow := sqlc.db.QueryRow(queryStr, topicId)
+	var latest string
+	err := queryRow.Scan(&latest)
+	if err != nil {
+		return "", err
+	}
+	return latest, nil
+
+}
 
 func (sqlc *SQLConn) CreateTable() error {
 	query := `
